@@ -189,7 +189,11 @@ def main():
                 with open(filepath, 'w') as f:
                     json.dump(sample, f)
                 print(f"[Saved] Gesture '{label}' as {filename}")
-                label = None
+                # Reset label if it has been 10 seconds
+                if time.time() - (timestamp / 1000) > 10:
+                    print(f"[Reset] Gesture '{label}'")
+                    label = None
+                
 
         # Show the mode and label on the frame
         text = f"Mode: {mode}"
