@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras import layers, models # type: ignore  (to remove import error that actually works)
+from tensorflow.keras.callbacks import EarlyStopping
 import pickle
 
 def augment_landmarks(landmarks, shift_range=0.02, noise_std=0.005):
@@ -67,11 +68,12 @@ for filepath in glob.glob(f'{datapath}/*.json'):
 # Data augmentation
 for i in range(len(X)):
     # For each original landmark, create 5 augmented landmarks
-    for j in range(1000):
-        # Augment the data by applying random transformations
-        augmented_landmarks = augment_landmarks(X[i])
-        X.append(augmented_landmarks)
-        y.append(y[i])  # Append the same label for the augmented data
+    if y[i] != 'Z':  # Dont augment 'Z' labels (there is already lots)
+        for j in range(200):
+            # Augment the data by applying random transformations
+            augmented_landmarks = augment_landmarks(X[i])
+            X.append(augmented_landmarks)
+            y.append(y[i])  # Append the same label for the augmented data
 
 X = np.array(X)
 y = np.array(y)
@@ -86,6 +88,9 @@ X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2,
 
 # Model definitions 
 num_classes = len(le.classes_)  # Number of classes (NZSL signs)
+
+# Early stopping callback
+early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
 def MLP():
     """
@@ -106,7 +111,7 @@ def MLP():
     return model
 
 model = MLP()
-model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stop])
 
 # Evaluate model
 print('Evaluating model...')

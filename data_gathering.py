@@ -158,7 +158,7 @@ def main():
 
         # Extract hand landmarks from frame
         results = hands.process(rgb)
-        if results.multi_hand_landmarks:
+        if len(results.multi_hand_landmarks)==2:
             landmarks = np.zeros((42,3))
 
             for index, hand in enumerate(results.multi_hand_landmarks):
@@ -190,13 +190,16 @@ def main():
                     json.dump(sample, f)
                 print(f"[Saved] Gesture '{label}' as {filename}")
                 # Reset label if it has been 10 seconds
-                if time.time() - (timestamp / 1000) > 10:
+                if int(time.time()) - (starttime) > 5:
                     print(f"[Reset] Gesture '{label}'")
                     label = None
                 
 
         # Show the mode and label on the frame
         text = f"Mode: {mode}"
+        if label:
+            text += f" | Label: {label}"
+        
         cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
         # show the hand landmarks
@@ -214,17 +217,18 @@ def main():
             if key >= ord('a') and key <= ord('z'):
                 label = chr(key).upper()
                 cv2.waitKey(2000)  # Wait for 2 second to pose the hands
+                starttime = int(time.time())
 
     cap.release()
     cv2.destroyAllWindows()
 
 
-    # Process each file in the landmarks_data directory
-    for filename in os.listdir(output_dir):
-        filepath = os.path.join(output_dir, filename)
-        if os.path.isfile(filepath) and filename.endswith('.json'):
-            print(f"Processing file: {filename}")
-            show_landmark_data(filepath)
+    # # Process each file in the landmarks_data directory
+    # for filename in os.listdir(output_dir):
+    #     filepath = os.path.join(output_dir, filename)
+    #     if os.path.isfile(filepath) and filename.endswith('.json'):
+    #         print(f"Processing file: {filename}")
+    #         show_landmark_data(filepath)
 
 if __name__ == "__main__":
     main()
