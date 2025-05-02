@@ -17,7 +17,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 import tensorflow as tf
 from tensorflow.keras import layers, models # type: ignore  (to remove import error that actually works)
-from tensorflow.keras.callbacks import EarlyStopping
 import pickle
 
 def augment_landmarks(landmarks, shift_range=0.02, noise_std=0.005):
@@ -65,16 +64,6 @@ for filepath in glob.glob(f'{datapath}/*.json'):
     X.append(landmarks)
     y.append(data['label'])
 
-# Data augmentation
-for i in range(len(X)):
-    # For each original landmark, create 5 augmented landmarks
-    if y[i] != 'Z':  # Dont augment 'Z' labels (there is already lots)
-        for j in range(200):
-            # Augment the data by applying random transformations
-            augmented_landmarks = augment_landmarks(X[i])
-            X.append(augmented_landmarks)
-            y.append(y[i])  # Append the same label for the augmented data
-
 X = np.array(X)
 y = np.array(y)
 # print(X.shape, y.shape)  # (num_samples, 126), (num_samples,)
@@ -86,11 +75,23 @@ y_encoded = le.fit_transform(y)
 # Split
 X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
 
+# Training data augmentation
+x_augmented = []
+y_augmented = []
+for i in range(len(X_train)):
+    # For each original landmark, create many augmented landmarks
+    for j in range(100):
+        # Augment the data by applying random transformations
+        augmented_landmarks = augment_landmarks(X_train[i])
+        x_augmented.append(augmented_landmarks)
+        y_augmented.append(y_train[i])  # Append the same label for the augmented data
+X_train = np.concatenate((X_train, np.array(x_augmented)), axis=0)
+y_train = np.concatenate((y_train, np.array(y_augmented)), axis=0)
+
+print(len(X_train), len(X_test))  # (num_samples, 126), (num_samples,)
+
 # Model definitions 
 num_classes = len(le.classes_)  # Number of classes (NZSL signs)
-
-# Early stopping callback
-early_stop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
 def MLP():
     """
@@ -111,7 +112,7 @@ def MLP():
     return model
 
 model = MLP()
-model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test), callbacks=[early_stop])
+model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate model
 print('Evaluating model...')
