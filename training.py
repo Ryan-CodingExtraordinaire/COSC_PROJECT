@@ -121,7 +121,7 @@ def MLP():
     return model
 
 model = MLP()
-# history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate model
 print('Evaluating model...')
