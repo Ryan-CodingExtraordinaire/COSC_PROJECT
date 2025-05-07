@@ -158,42 +158,44 @@ def main():
 
         # Extract hand landmarks from frame
         results = hands.process(rgb)
-        if len(results.multi_hand_landmarks)==2:
-            landmarks = np.zeros((42,3))
+        if results.multi_hand_landmarks:
+            if len(results.multi_hand_landmarks) == 2:
+                # Create an array to hold the landmarks for both hands
+                landmarks = np.zeros((42,3))
 
-            for index, hand in enumerate(results.multi_hand_landmarks):
-                # Draw hand landmarks
-                mp_draw.draw_landmarks(frame, hand, mp_hands.HAND_CONNECTIONS)
-                # Extract handedness and landmarks
-                handedness = results.multi_handedness[index].classification[0].label
-                hand_landmarks = hand.landmark 
-                if handedness == 'Right':
-                    landmarks[0:21] = np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks])
-                else:
-                    landmarks[21:42] = np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks])
-            # print(landmarks)
+                for index, hand in enumerate(results.multi_hand_landmarks):
+                    # Draw hand landmarks
+                    mp_draw.draw_landmarks(frame, hand, mp_hands.HAND_CONNECTIONS)
+                    # Extract handedness and landmarks
+                    handedness = results.multi_handedness[index].classification[0].label
+                    hand_landmarks = hand.landmark 
+                    if handedness == 'Right':
+                        landmarks[0:21] = np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks])
+                    else:
+                        landmarks[21:42] = np.array([[lm.x, lm.y, lm.z] for lm in hand_landmarks])
+                # print(landmarks)
 
-            if mode == "Train" and label:
-                landmarks_normalized = normalise_landmarks(landmarks)
-                timestamp = int(time.time() * 1000)  # Milliseconds
-                sample = {
-                    'label': label,
-                    'timestamp': timestamp,
-                    'left_hand': landmarks_normalized[0:21].tolist(),
-                    'right_hand': landmarks_normalized[21:42].tolist()
-                }
+                if mode == "Train" and label:
+                    landmarks_normalized = normalise_landmarks(landmarks)
+                    timestamp = int(time.time() * 1000)  # Milliseconds
+                    sample = {
+                        'label': label,
+                        'timestamp': timestamp,
+                        'left_hand': landmarks_normalized[0:21].tolist(),
+                        'right_hand': landmarks_normalized[21:42].tolist()
+                    }
 
-                filename = f"{label}_{timestamp}.json"
-                filepath = os.path.join(output_dir, filename)
+                    filename = f"{label}_{timestamp}.json"
+                    filepath = os.path.join(output_dir, filename)
 
-                with open(filepath, 'w') as f:
-                    json.dump(sample, f)
-                print(f"[Saved] Gesture '{label}' as {filename}")
-                # Reset label if it has been 10 seconds
-                if int(time.time()) - (starttime) > 5:
-                    print(f"[Reset] Gesture '{label}'")
-                    label = None
-                
+                    with open(filepath, 'w') as f:
+                        json.dump(sample, f)
+                    print(f"[Saved] Gesture '{label}' as {filename}")
+                    # Reset label if it has been 10 seconds
+                    if int(time.time()) - (starttime) > 5:
+                        print(f"[Reset] Gesture '{label}'")
+                        label = None
+                    
 
         # Show the mode and label on the frame
         text = f"Mode: {mode}"

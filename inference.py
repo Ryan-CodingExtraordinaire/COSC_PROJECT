@@ -33,7 +33,7 @@ while True:
     ret, frame = cap.read()
     if not ret:
         break
-
+    frame = cv2.flip(frame, 1)  # Flip the frame horizontally
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(frame_rgb)
     if results.multi_hand_landmarks:
