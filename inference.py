@@ -74,6 +74,9 @@ while True:
         cv2.putText(frame, f'Predicted: {label} ({confidence:.2f}%)', (10, 30),
                     cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         update_bar_chart(probabilities)
+    else:
+        update_bar_chart([0] * len(class_names))
+    
     cv2.imshow('Hand Sign Inference', frame)
     if cv2.waitKey(1) & 0xFF == 27:
         break
