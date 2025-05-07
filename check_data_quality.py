@@ -27,8 +27,7 @@ ax.bar(labels, [labels.count(label) for label in labels], color='blue', alpha=0.
 # Add labels and title
 ax.set_xlabel('Labels')
 ax.set_ylabel('Frequency')
-ax.set_title('Distribution of Labels')
-
+# ax.set_title('Distribution of Labels')
 plt.tight_layout()
 
 # Show the plot

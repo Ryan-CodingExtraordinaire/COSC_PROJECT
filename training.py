@@ -74,14 +74,14 @@ le = LabelEncoder()
 y_encoded = le.fit_transform(y)
 
 # Split
-X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
 
 # Training data augmentation
 x_augmented = []
 y_augmented = []
 for i in range(len(X_train)):
     # For each original landmark, create many augmented landmarks
-    for j in range(100):
+    for j in range(3):
         # Augment the data by applying random transformations
         augmented_landmarks = augment_landmarks(X_train[i])
         x_augmented.append(augmented_landmarks)
@@ -89,7 +89,7 @@ for i in range(len(X_train)):
 X_train = np.concatenate((X_train, np.array(x_augmented)), axis=0)
 y_train = np.concatenate((y_train, np.array(y_augmented)), axis=0)
 
-print(len(X_train), len(X_test))  # (num_samples, 126), (num_samples,)
+print(f"train: {len(X_train)}, Test: {len(X_test)}")  # (num_samples, 126), (num_samples,)
 
 # Model definitions 
 num_classes = len(le.classes_)  # Number of classes (NZSL signs)
