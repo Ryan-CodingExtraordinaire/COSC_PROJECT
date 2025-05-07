@@ -43,12 +43,12 @@ def normalise_landmarks(landmarks):
     # Establish which hands are present
     left_hand = landmarks[0:21].copy()
     right_hand = landmarks[21:42].copy()
-    has_left = True
-    has_right = True
+    has_left = False
+    has_right = False
     if np.all(left_hand != 0):
-        has_left = False
+        has_left = True
     if np.all(right_hand != 0):
-        has_right = False
+        has_right = True
     
     # If only one hand is present then make each hand have the same values
     if has_left != has_right: 
@@ -159,7 +159,7 @@ def main():
         # Extract hand landmarks from frame
         results = hands.process(rgb)
         if results.multi_hand_landmarks:
-            if len(results.multi_hand_landmarks) == 2:
+            if len(results.multi_hand_landmarks) <= 2:
                 # Create an array to hold the landmarks for both hands
                 landmarks = np.zeros((42,3))
 

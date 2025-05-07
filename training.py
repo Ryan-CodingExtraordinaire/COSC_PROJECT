@@ -11,6 +11,7 @@ to predict hand shapes. The model is then saved for later use.
 Data augmentation is used to increase the size of the dataset and improve the model's performance.
 """
 import numpy as np
+import matplotlib.pyplot as plt
 import json
 import glob
 from sklearn.model_selection import train_test_split
@@ -93,6 +94,14 @@ print(len(X_train), len(X_test))  # (num_samples, 126), (num_samples,)
 # Model definitions 
 num_classes = len(le.classes_)  # Number of classes (NZSL signs)
 
+def KNN():
+    """
+    Define a KNN model.
+    """
+    from sklearn.neighbors import KNeighborsClassifier
+    knn = KNeighborsClassifier(n_neighbors=5, n_jobs=-1)
+    return knn
+
 def MLP():
     """
     Define a simple MLP model.
@@ -112,7 +121,7 @@ def MLP():
     return model
 
 model = MLP()
-model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+# history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate model
 print('Evaluating model...')
@@ -124,3 +133,7 @@ model.save('models_and_encoders/hand_sign_model.keras')
 # Save label encoder too (important for decoding predictions later!)
 with open('models_and_encoders/label_encoder.pkl', 'wb') as f:
     pickle.dump(le, f)
+#Save training history for later analysis
+with open('models_and_encoders/training_history.pkl', 'wb') as f:
+    pickle.dump(history.history, f)
+
