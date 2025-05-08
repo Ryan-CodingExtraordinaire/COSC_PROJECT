@@ -71,11 +71,15 @@ def compare_augmentation(histories):
     ax = plt.axes()
     for history, number in histories:
         ax.plot(history['val_loss'], label=f'Augmentation factor: {number}')
-    ax.set_title('Training Accuracy vs Augmentation Factor')
+    # ax.set_title('Training Accuracy vs Augmentation Factor')
     plt.legend()
     plt.xlabel('Epoch')
-
+    plt.ylabel('Validation Loss')
     plt.show()
-
+# Print keys for a history object
+if len(histories) > 0:
+    print("Keys in a history object:", list(histories[0][0].keys()))
+else:
+    print("No history objects found.")
 # plot_training_curves(history)
 compare_augmentation(histories)
