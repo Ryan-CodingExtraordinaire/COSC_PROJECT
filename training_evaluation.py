@@ -2,12 +2,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import pickle
+import glob
+import os
 
-# Load the model history
-history_path = 'models_and_encoders/training_history.pkl'  # Path to the model history file
-with open(history_path, 'rb') as f:
-    history = pickle.load(f)
-print(history.keys())  # Check the keys in the history dictionary
+# Load all model history files
+history_files = glob.glob('models_and_encoders/training_history_*.pkl')  # Match all files with the pattern
+histories = []  # List to store histories and their corresponding numbers
+
+for file_path in history_files:
+    # Extract the number at the end of the file name
+    file_name = os.path.basename(file_path)
+    number = int(file_name.split('_')[-1].split('.')[0])  # Extract the number before the file extension
+
+    # Load the history
+    with open(file_path, 'rb') as f:
+        history = pickle.load(f)
+    
+    # Append the history and its number as a tuple
+    histories.append((history, number))
+histories = np.array(histories)
+
 
 # Plot Metrics
 def plot_training_curves(history):
@@ -31,7 +45,6 @@ def plot_training_curves(history):
 
     plt.tight_layout()
     plt.show()
-
 def plot_confusion_matrix(y_true, y_pred, labels):
     """
     Plot confusion matrix using sklearn's confusion_matrix and ConfusionMatrixDisplay.
@@ -47,5 +60,22 @@ def plot_confusion_matrix(y_true, y_pred, labels):
     disp.plot(cmap='Blues', xticks_rotation=45)
     plt.title("Confusion Matrix")
     plt.show()
+def compare_augmentation(histories):
+    """
+    Compare the training curves of different models based on their training history.
+    Arguments:
+    histories -- list of tuples (history, number) where history is the training history and number is the model number
+    Returns:
+    None
+    """
+    ax = plt.axes()
+    for history, number in histories:
+        ax.plot(history['val_loss'], label=f'Augmentation factor: {number}')
+    ax.set_title('Training Accuracy vs Augmentation Factor')
+    plt.legend()
+    plt.xlabel('Epoch')
 
-plot_training_curves(history)
+    plt.show()
+
+# plot_training_curves(history)
+compare_augmentation(histories)

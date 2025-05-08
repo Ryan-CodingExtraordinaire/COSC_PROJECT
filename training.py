@@ -77,11 +77,12 @@ y_encoded = le.fit_transform(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
 
 # Training data augmentation
+numAugment = 25
 x_augmented = []
 y_augmented = []
 for i in range(len(X_train)):
     # For each original landmark, create many augmented landmarks
-    for j in range(3):
+    for j in range(numAugment):
         # Augment the data by applying random transformations
         augmented_landmarks = augment_landmarks(X_train[i])
         x_augmented.append(augmented_landmarks)
@@ -129,11 +130,11 @@ test_loss, test_accuracy = model.evaluate(X_test, y_test)
 print(f'Test Accuracy: {test_accuracy:.2f} over {len(X_test)} samples')
 
 # Save model
-model.save('models_and_encoders/hand_sign_model.keras')
+model.save(f'models_and_encoders/hand_sign_model_{numAugment}.keras')
 # Save label encoder too (important for decoding predictions later!)
 with open('models_and_encoders/label_encoder.pkl', 'wb') as f:
     pickle.dump(le, f)
 #Save training history for later analysis
-with open('models_and_encoders/training_history.pkl', 'wb') as f:
+with open(f'models_and_encoders/training_history_{numAugment}.pkl', 'wb') as f:
     pickle.dump(history.history, f)
 
