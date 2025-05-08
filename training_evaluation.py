@@ -20,6 +20,9 @@ for file_path in history_files:
     
     # Append the history and its number as a tuple
     histories.append((history, number))
+
+# Sort the histories list by the number in ascending order
+histories.sort(key=lambda x: x[1])
 histories = np.array(histories)
 
 
@@ -45,21 +48,7 @@ def plot_training_curves(history):
 
     plt.tight_layout()
     plt.show()
-def plot_confusion_matrix(y_true, y_pred, labels):
-    """
-    Plot confusion matrix using sklearn's confusion_matrix and ConfusionMatrixDisplay.
-    Arguments:
-    y_true -- true labels
-    y_pred -- predicted labels
-    labels -- list of class labels
-    Returns:
-    None
-    """
-    cm = confusion_matrix(y_true, y_pred, labels=labels)
-    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=labels)
-    disp.plot(cmap='Blues', xticks_rotation=45)
-    plt.title("Confusion Matrix")
-    plt.show()
+
 def compare_augmentation(histories):
     """
     Compare the training curves of different models based on their training history.
@@ -76,10 +65,9 @@ def compare_augmentation(histories):
     plt.xlabel('Epoch')
     plt.ylabel('Validation Loss')
     plt.show()
-# Print keys for a history object
-if len(histories) > 0:
-    print("Keys in a history object:", list(histories[0][0].keys()))
-else:
-    print("No history objects found.")
+
+
+print("Keys in a history object:", list(histories[0][0].keys()))
+
 # plot_training_curves(history)
 compare_augmentation(histories)

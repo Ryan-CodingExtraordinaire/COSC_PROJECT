@@ -77,7 +77,7 @@ y_encoded = le.fit_transform(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
 
 # Training data augmentation
-numAugment = 25
+numAugment = 10
 x_augmented = []
 y_augmented = []
 for i in range(len(X_train)):
@@ -122,7 +122,7 @@ def MLP():
     return model
 
 model = MLP()
-history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=25, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate model
 print('Evaluating model...')
