@@ -23,6 +23,17 @@ mp_draw = mp.solutions.drawing_utils
 
 # Webcam
 cap = cv2.VideoCapture(0)
+camera_matrix = None
+try:
+    camera_matrix = np.loadtxt('./camera_matrix.npy')
+    distortion_coeff = np.loadtxt('./distortion_coeff.npy')
+    ret, frame = cap.read()
+    h, w = frame.shape[:2]
+    new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(camera_matrix, distortion_coeff, (w,h), 1, (w,h))
+    mapx, mapy = cv2.initUndistortRectifyMap(camera_matrix, distortion_coeff, None, new_camera_matrix, (w,h), cv2.CV_16SC2)
+except:
+    print("Camera calibration files not found. Please run find_camera_calibration.py first.")
+
 
 # Matplotlib setup for live bar chart
 plt.ion()
@@ -50,7 +61,17 @@ while True:
     ret, frame = cap.read()
     if not ret:
         break
-    frame = cv2.flip(frame, 1)  # Flip the frame horizontally
+    if type(camera_matrix) != None:
+        # Undistort the image
+        dst = cv2.undistort(frame, camera_matrix, distortion_coeff, None, new_camera_matrix)  # Undistort the image.
+
+        # Crop the image.
+        x,y,w,h = roi
+        dst = dst[y:y+h, x:x+w]
+        frame = cv2.flip(dst, 1)  # Flip the frame horizontally
+    else:
+        frame = cv2.flip(frame, 1)
+
     frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     results = hands.process(frame_rgb)
     if results.multi_hand_landmarks:
