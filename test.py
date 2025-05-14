@@ -1,3 +1,10 @@
+"""
+Normalisation visual comparison of hand landmarks
+This script captures video from the webcam, processes it using Mediapipe to detect hand landmarks,
+and visualizes the original and normalized landmarks side by side.
+It uses the `normalise_landmarks` function from the `data_gathering` module to normalize the landmarks.
+"""
+
 from data_gathering import normalise_landmarks
 import numpy as np
 import mediapipe as mp
@@ -19,10 +26,8 @@ while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
         break
-
     # Convert the frame to RGB
     rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
     # Process the frame with Mediapipe Hands
     results = hands.process(rgb_frame)
     landmarks = np.zeros((42, 3))
@@ -45,6 +50,7 @@ while cap.isOpened():
     axs[0].cla()  # Clear previous plot
     axs[0].scatter(landmarks[:, 0], landmarks[:, 1], c='blue')
     axs[0].invert_yaxis()
+    axs[0].plot(0,0)
     axs[0].set_title("Original Landmarks")
     for connection in mp_hands.HAND_CONNECTIONS:
         start_idx, end_idx = connection
@@ -58,6 +64,7 @@ while cap.isOpened():
     axs[1].cla()  # Clear previous plot
     axs[1].scatter(normalized_landmarks[:, 0], normalized_landmarks[:, 1], c='red')
     axs[1].invert_yaxis()
+    axs[1].plot(0,0)
     axs[1].set_title("Normalized Landmarks")
     for connection in mp_hands.HAND_CONNECTIONS:
         start_idx, end_idx = connection

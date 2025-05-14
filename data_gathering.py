@@ -41,8 +41,9 @@ def normalise_landmarks(landmarks):
     Output: normalised (42, 3) landmarks for two hands."""
 
     # Establish which hands are present
-    left_hand = landmarks[0:21].copy()
-    right_hand = landmarks[21:42].copy()
+    landmarks = landmarks.copy()
+    left_hand = landmarks[0:21]
+    right_hand = landmarks[21:42]
     has_left = False
     has_right = False
     if np.all(left_hand != 0):
@@ -63,8 +64,9 @@ def normalise_landmarks(landmarks):
     landmarks -= origin
 
     # Choose scale: farthest landmark distance from origin
-    max_distance = np.max(np.linalg.norm(landmarks - origin, axis=1))
+    max_distance = (np.linalg.norm(landmarks[:,:2], axis=1)).max()
     landmarks /= np.abs(max_distance)
+    
     return landmarks
 
 def main():

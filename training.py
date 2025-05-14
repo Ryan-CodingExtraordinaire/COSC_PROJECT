@@ -32,8 +32,6 @@ def augment_landmarks(landmarks, shift_range=0.02, noise_std=0.005):
     noise = np.random.normal(0, noise_std, landmarks_to_vary.shape)
     landmarks_to_vary += noise
     
-    
-
     # Random translations to each hand
     left_hand = landmarks[:63]  # Left hand nonzero landmarks
     right_hand = landmarks[63:]  # Right hand nonzero landmarks
@@ -47,7 +45,6 @@ def augment_landmarks(landmarks, shift_range=0.02, noise_std=0.005):
         hand[hand[:,1]!=0, 1] += shift_y
         hand[hand[:,2]!=0, 2] += shift_z
     
-
     return landmarks.reshape(-1).tolist()  # Flatten back to (126) list
 
 X = []
@@ -122,7 +119,7 @@ def MLP():
     return model
 
 model = MLP()
-history = model.fit(X_train, y_train, epochs=25, batch_size=32, validation_data=(X_test, y_test))
+history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=(X_test, y_test))
 
 # Evaluate model
 print('Evaluating model...')

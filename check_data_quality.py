@@ -15,12 +15,13 @@ def check():
                 data.append(json_data)  # Append each JSON object to the list
 
     # Check if the 'label' key exists in the data
-    if not all('label' in item for item in data):
-        raise ValueError("Some entries in the dataset do not contain a 'label' key.")
+    # if not all('label' in item for item in data):
+    #     raise ValueError("Some entries in the dataset do not contain a 'label' key.")
 
 
     # Plot the distribution of labels
     labels = [item['label'] for item in data]
+    labels = ['NullPose' if label == 'Z' else label for label in labels]
     ax = plt.axes()
     ax.bar(labels, [labels.count(label) for label in labels], color='blue', alpha=0.7)
     # Add labels and title
@@ -31,3 +32,4 @@ def check():
 
     # Show the plot
     plt.show()
+check()
