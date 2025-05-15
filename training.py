@@ -26,15 +26,15 @@ def augment_landmarks(landmarks, shift_range=0.02, noise_std=0.005):
     This is to add variation in joint locations *and* in relitive hand positions.
     """
     landmarks = np.array(landmarks).reshape(-1, 3)  # Reshape to (num_landmarks, 3)
-    landmarks_to_vary = landmarks[landmarks != 0]
+    landmarks_to_vary = landmarks[landmarks != 0] # This might be a relec from when normalisation left missing hands as zeros
 
     # Random small Gaussian noise to each nonzero landmark
     noise = np.random.normal(0, noise_std, landmarks_to_vary.shape)
     landmarks_to_vary += noise
     
     # Random translations to each hand
-    left_hand = landmarks[:63]  # Left hand nonzero landmarks
-    right_hand = landmarks[63:]  # Right hand nonzero landmarks
+    left_hand = landmarks[:21]  # Left hand nonzero landmarks
+    right_hand = landmarks[21:]  # Right hand nonzero landmarks
     for hand in [left_hand, right_hand]:
         # Random translation in x, y, z directions
         shift_x = np.random.uniform(-shift_range, shift_range)
