@@ -6,7 +6,7 @@ import glob
 import os
 
 # Load all model history files
-history_files = glob.glob('models_and_encoders/training_history_*.pkl')  # Match all files with the pattern
+history_files = glob.glob('models_and_encoders/2training_history_*.pkl')  # Match all files with the pattern
 histories = []  # List to store histories and their corresponding numbers
 
 for file_path in history_files:
@@ -33,7 +33,7 @@ def plot_training_curves(history):
     # Accuracy
     axs[0].plot(history['accuracy'], label='Train')
     axs[0].plot(history['val_accuracy'], label='Val')
-    axs[0].set_title('Accuracy')
+    # axs[0].set_title('Accuracy')
     axs[0].set_xlabel('Epoch')
     axs[0].set_ylabel('Accuracy')
     axs[0].legend()
@@ -41,7 +41,7 @@ def plot_training_curves(history):
     # Loss
     axs[1].plot(history['loss'], label='Train')
     axs[1].plot(history['val_loss'], label='Val')
-    axs[1].set_title('Loss')
+    # axs[1].set_title('Loss')
     axs[1].set_xlabel('Epoch')
     axs[1].set_ylabel('Loss')
     axs[1].legend()
@@ -57,17 +57,39 @@ def compare_augmentation(histories):
     Returns:
     None
     """
-    ax = plt.axes()
+    xs = []
+    ys = []
     for history, number in histories:
-        ax.plot(history['val_loss'], label=f'Augmentation factor: {number}')
+        loss = history['loss']
+        val_loss = history['val_loss']
+
+        xs.append(number)
+        patience = 5
+        count = 0
+        for epoch in range(len(history['loss'])):
+            if val_loss[epoch] > loss[epoch]:
+                count += 1
+            else:
+                count = 0
+            if count > patience:                
+                ys.append(epoch-patience+1)
+                break
+            if epoch == len(history['loss']) - 1:
+                ys.append(0)
+
+
+
+        
+    ax = plt.axes()
     # ax.set_title('Training Accuracy vs Augmentation Factor')
-    plt.legend()
-    plt.xlabel('Epoch')
-    plt.ylabel('Validation Loss')
+    ax.scatter(xs, ys, label='Overfited epoch')
+    # plt.legend()
+    plt.xlabel('Augmentation factor')
+    plt.ylabel('Epoch causing overfitting')
     plt.show()
 
 
 print("Keys in a history object:", list(histories[0][0].keys()))
 
-# plot_training_curves(history)
-compare_augmentation(histories)
+plot_training_curves(histories[0][0])
+# compare_augmentation(histories)

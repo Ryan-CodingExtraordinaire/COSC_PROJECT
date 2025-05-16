@@ -74,16 +74,22 @@ y_encoded = le.fit_transform(y)
 X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42, stratify=y_encoded)
 
 # Training data augmentation
-numAugment = 10
+#{1,2,3,5,6,7,8,9,11,13,15} used to check overfitting trend (~17 epochs ).
+#{4} is 200 epochs 
+#{-} is with 10 epochs and 3 num augmentations
+saveModel = 0
+saveHistory = 0
+numAugment = 3
 x_augmented = []
 y_augmented = []
 for i in range(len(X_train)):
     # For each original landmark, create many augmented landmarks
-    for j in range(numAugment):
-        # Augment the data by applying random transformations
-        augmented_landmarks = augment_landmarks(X_train[i])
-        x_augmented.append(augmented_landmarks)
-        y_augmented.append(y_train[i])  # Append the same label for the augmented data
+    if y_train[i] != 0:  # Skip if the label is 'Z' (Null Pose)
+        for j in range(numAugment):
+            # Augment the data by applying random transformations
+            augmented_landmarks = augment_landmarks(X_train[i])
+            x_augmented.append(augmented_landmarks)
+            y_augmented.append(y_train[i])  # Append the same label for the augmented data
 X_train = np.concatenate((X_train, np.array(x_augmented)), axis=0)
 y_train = np.concatenate((y_train, np.array(y_augmented)), axis=0)
 
@@ -124,14 +130,19 @@ history = model.fit(X_train, y_train, epochs=10, batch_size=32, validation_data=
 # Evaluate model
 print('Evaluating model...')
 test_loss, test_accuracy = model.evaluate(X_test, y_test)
-print(f'Test Accuracy: {test_accuracy:.2f} over {len(X_test)} samples')
+print(f'Test Accuracy: {test_accuracy:.4f} over {len(X_test)} samples')
 
 # Save model
-model.save(f'models_and_encoders/hand_sign_model_{numAugment}.keras')
-# Save label encoder too (important for decoding predictions later!)
-with open('models_and_encoders/label_encoder.pkl', 'wb') as f:
-    pickle.dump(le, f)
-#Save training history for later analysis
-with open(f'models_and_encoders/training_history_{numAugment}.pkl', 'wb') as f:
-    pickle.dump(history.history, f)
+if saveModel:
+    # Save the model
+    model.save(f'models_and_encoders/hand_sign_model_{numAugment}.keras')
+    print(f'Model saved as hand_sign_model_{numAugment}.keras')
+    # Save label encoder too (important for decoding predictions later!)
+    with open('models_and_encoders/label_encoder.pkl', 'wb') as f:
+        pickle.dump(le, f)
+if saveHistory:
+    # Save the model history
+    with open(f'models_and_encoders/training_history_{numAugment}.pkl', 'wb') as f:
+        pickle.dump(history.history, f)
+    print(f'Model history saved as training_history_{numAugment}.pkl')
 

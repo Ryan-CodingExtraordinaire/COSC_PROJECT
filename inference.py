@@ -39,6 +39,7 @@ except:
 plt.ion()
 fig, ax = plt.subplots()
 class_names = encoder.classes_
+class_names = [name if name != 'Z' else 'Null Pose' for name in class_names]
 bar_container = ax.bar(class_names, [0] * len(class_names))
 ax.set_ylim(0, 1)
 ax.set_ylabel('Probability')
@@ -91,9 +92,12 @@ while True:
         probabilities = prediction[0]
         class_id = np.argmax(probabilities)
         label = encoder.inverse_transform([class_id])[0]
+        if label == 'Z':
+            label = 'Null Pose'
+        
         confidence = probabilities[class_id] * 100
         cv2.putText(frame, f'Predicted: {label} ({confidence:.2f}%)', (10, 30),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 2, cv2.LINE_AA)
         update_bar_chart(probabilities)
     else:
         update_bar_chart([0] * len(class_names))
