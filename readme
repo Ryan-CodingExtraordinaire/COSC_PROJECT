@@ -1,0 +1,47 @@
+# New Zealand Sign language hand pose recognition
+
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+
+## Introduction
+This collection of scripts provides data gathering, normalisation, training and inference tools for a complete machine vision pipeline. 
+
+## Installation
+import cv2
+import matplotlib
+import numpy
+import mediapipe
+import tensorflow
+import sklearn
+import pickle
+
+## Usage
+Run data gathering to generate training data set, pressing '~' activates training mode in which any alphabet key press will log ~8 sec of webcam frames where the hand landmarks are stored in json files under that letter. 
+
+Running training will automatically load the data and start training. It stores the output in "models and encoders" and the number after the name is the amount of data augmentation conducted in training. 
+
+Inference loads a specified model and will plot the class probabilities with the hand overlay
+
+"Check data quality" will plot the amount of each lable in the saved data to check for any class imballance
+
+find camera calibration is from the COSC428 lab 1, read up buddy
+
+Training evaluation loads the training histories and plots some basic data parameters. 
+
+
+
+## Contributing
+Guidelines for contributing to the project.
+
+## License
+State the license and link to the license file.
+
+## Contact
+How to reach the maintainers or get support.
